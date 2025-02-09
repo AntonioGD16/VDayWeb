@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prinde Inimioarele ❤️</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: pink;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #gameCanvas {
+            background: white;
+            border: 2px solid red;
+            margin-bottom: 10px;
+        }
+        .garofita {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #ff69b4;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            animation: fall 2s linear infinite;
+        }
+
+        @keyframes fall {
+            from {
+                top: -50px;
+            }
+            to {
+                top: 100vh;
+            }
+        }
+
+        .flower {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #ff69b4;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transform: rotate(45deg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: flowerFall 3s linear infinite;
+        }
+
+        @keyframes flowerFall {
+            from {
+                top: -50px;
+            }
+            to {
+                top: 100vh;
+            }
+        }
+
+        .flower:before, .flower:after {
+            content: "";
+            position: absolute;
+            width: 25px;
+            height: 10px;
+            background-color: #ff1493;
+            border-radius: 5px;
+        }
+
+        .flower:before {
+            transform: rotate(45deg);
+        }
+
+        .flower:after {
+            transform: rotate(-45deg);
+        }
+
+        .message {
+            font-size: 1.5em;
+            color: white;
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .score {
+            font-size: 1.2em;
+            color: white;
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="message">Prinde Inimioarele! 💖</div>
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+    <div class="score">Scor: <span id="score">0</span></div>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        let score = 0;
+        let basket = { x: 175, width: 50, height: 20 };
+        let hearts = [];
+
+        function drawBasket() {
+            ctx.fillStyle = "red";
+            ctx.fillRect(basket.x, canvas.height - 30, basket.width, basket.height);
+        }
+        
+        function drawHearts() {
+            ctx.fillStyle = "hotpink";
+            hearts.forEach(heart => {
+                ctx.beginPath();
+                ctx.arc(heart.x, heart.y, 10, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        
+        function updateHearts() {
+            hearts.forEach((heart, index) => {
+                heart.y += 2;
+                if (heart.y > canvas.height - 30 && heart.x > basket.x && heart.x < basket.x + basket.width) {
+                    score++;
+                    document.getElementById("score").innerText = score;
+                    hearts.splice(index, 1);
+                    if (score >= 1) {
+                        showValentinePage();
+                    }
+                }
+                if (heart.y > canvas.height) {
+                    hearts.splice(index, 1);
+                }
+            });
+        }
+        
+        function spawnHeart() {
+            let x = Math.random() * (canvas.width - 20) + 10;
+            hearts.push({ x: x, y: 0 });
+        }
+        
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBasket();
+            drawHearts();
+            updateHearts();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function showValentinePage() {
+            document.body.innerHTML = '<div class="message">Will you be my Valentine? 💘</div>';
+            document.body.style.backgroundColor = "pink";
+            setInterval(spawnFlower, 500);
+        }
+        
+        function spawnFlower() {
+            let flower = document.createElement("div");
+            flower.classList.add("flower");
+            flower.style.left = Math.random() * window.innerWidth + "px";
+            document.body.appendChild(flower);
+            
+            flower.addEventListener("animationiteration", () => {
+                flower.style.left = Math.random() * window.innerWidth + "px";
+            });
+        }
+        
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft" && basket.x > 0) basket.x -= 20;
+            if (event.key === "ArrowRight" && basket.x < canvas.width - basket.width) basket.x += 20;
+        });
+
+        // Control touch pentru telefon
+        let touchStartX = 0;
+
+        canvas.addEventListener("touchstart", (e) => {
+            touchStartX = e.touches[0].clientX;
+        });
+
+        canvas.addEventListener("touchmove", (e) => {
+            let touchMoveX = e.touches[0].clientX;
+            let deltaX = touchMoveX - touchStartX;
+            basket.x += deltaX;
+
+            // Limite pentru mișcare
+            if (basket.x < 0) basket.x = 0;
+            if (basket.x > canvas.width - basket.width) basket.x = canvas.width - basket.width;
+
+            touchStartX = touchMoveX;
+        });
+
+        setInterval(spawnHeart, 1000);
+        gameLoop();
+    </script>
+</body>
+</html>
