@@ -1,0 +1,1 @@
+This website was created as a gift for my girlfriend for Valentine's Day. It features a mini-game in which players must catch 28 hearts (representing her birthday). After successfully catching all the hearts, the player is redirected to another page where is asked to be my Valentine. I also used GitHub Pages to host the website and to share the URL with her.
